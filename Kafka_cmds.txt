@@ -1,0 +1,80 @@
+wget https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz
+ls
+tar -xvf kafka_2.13-3.7.0.tgz kafka_2.13-3.7.0/
+
+----------------
+java -version
+Sudo yum install java
+java -version
+---------------
+Cd kafka_2.13-3.7.0
+
+
+-------start zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+----error in this: then follow this-------------------
+Follow below steps to resolve this error.
+
+step1: Get inside kafka downloaded folder
+
+cd kafka-2.5.0-src
+step2: Run gradle
+
+./gradlew jar 
+step3: Once build is successful, start the kafka server
+
+bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/kafka-server-start.sh config/server.properties
+----------------------------------------------------
+
+Open a new cmd, again ssh
+
+export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+cd kafka_2.13-3.7.0/
+bin/kafka-server-start.sh config/server.properties
+
+
+it will be pointing to private ip; we need to put into public ip
+
+do a sudo nano config/server.properties
+
+uncomment the line #advertised.listeners=PLAINTEXT://your.host.name:9092
+
+and put your ec2 public address in the place of your.host.name
+
+
+------------if error: address already in use---------
+do sudo bin/zookeeper-server-stop.sh
+
+if works; try running server start again
+
+else
+
+netstat -ant | grep :2181
+
+sudo lsof -i :2181
+
+sudo kill -9 process_id
+
+------------------------------------------------------
+
+--------create the topic-------------
+new window
+
+cd kafka_dir
+
+bin/kafka-topics.sh --create --topic demo_test --bootstrap-server <public ip of ec2>:9092 --replication-factor 1 --partitions 1
+
+-------start producer-----------
+
+bin/kafka-console-producer.sh --topic demo_test --bootstrap-server <public ip of ec2>:9092
+
+-------start consumer----------
+
+bin/kafka-console-consumer.sh --topic demo_test --bootstrap-server <public ip of ec2>:9092
+
+
+52.53.167.112
+
+https://github.com/darshilparmar/stock-market-kafka-data-engineering-project
